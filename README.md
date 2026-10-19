@@ -6,10 +6,10 @@ Phase 1: authenticated SignalFit workspace with bcrypt sessions, authenticator T
 
 ## Run locally
 
-1. Provide `DATABASE_URL`, `SESSION_SECRET`, and optionally `GEMINI_API_KEY` / `GEMINI_MODEL` through the workspace Secrets panel. The existing Phase 1 migration must be applied (it is already applied in the connected database).
+1. Provide `DATABASE_URL`, `SESSION_SECRET`, and optionally `GEMINI_API_KEY` / `GEMINI_MODEL` through the workspace Secrets panel. The existing Phase 1 migration and the forward-only interview uniqueness/index migration must be applied in the connected database.
 2. Run `npm install`.
 3. Run `npm run dev` and open the displayed local URL.
 
-Useful commands: `npm run lint`, `npm test`, `npm run build`.
+Useful commands: `npm run lint`, `npm test`, `npm run build`. Tests cover the real health handler, interview branching, and profile validation.
 
 `GET /api/health` reports service status and whether server-side database/AI configuration is present. Create an account, scan the authenticator QR code, verify a code, then complete the interview. If Gemini is unavailable, the app preserves answers and shows an incomplete draft; configure the key for live synthesis. Research is not part of this phase.

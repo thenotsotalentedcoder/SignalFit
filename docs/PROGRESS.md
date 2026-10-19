@@ -1,8 +1,8 @@
 # Progress
 
 ## Current state
-- Phase 1 vertical slice is wired: bcrypt signup/signin, database sessions, encrypted TOTP enrollment/challenge, AAL2 workspace gate, owner-scoped PostgreSQL queries, resumable interview, Gemini profile synthesis, review and confirmation.
-- The existing Phase 1 migration is applied; no migration was changed or added.
+- Phase 1 vertical slice is wired and repaired: bcrypt signup/signin, database sessions, encrypted TOTP enrollment/challenge, AAL2 workspace gate, owner-scoped PostgreSQL queries, resumable interview, Gemini profile synthesis, review and confirmation.
+- The existing Phase 1 migration was not changed. A forward-only uniqueness/index migration was applied for resumable answer updates.
 - Research, matching, outreach and full recovery-code handling remain future work.
 
 ## Decisions

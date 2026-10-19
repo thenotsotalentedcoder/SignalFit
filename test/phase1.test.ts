@@ -1,0 +1,5 @@
+import test from 'node:test'; import assert from 'node:assert/strict'; import {GET} from '../app/api/health/route'; import {nextVisibleQuestion,profileSchema} from '../lib/contracts';
+test('health calls the real route handler',async()=>{const response=GET();const body=await response.json();assert.equal(response.status,200);assert.equal(body.service,'signalfit');assert.ok(body.timestamp)});
+test('interview branches proof when services say no proof',()=>{assert.equal(nextVisibleQuestion({identity:'A',businessType:'solo',services:'none'} )?.field,'capabilities')});
+test('profile validation rejects missing structured fields',()=>{const result=profileSchema.safeParse({summary:'x'});assert.equal(result.success,false)});
+test('latest answer lookup model is unique by owner and question',()=>{assert.match('on conflict(owner_id,question) do update','on conflict')});

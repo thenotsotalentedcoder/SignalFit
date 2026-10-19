@@ -1,0 +1,1 @@
+create unique index if not exists interview_answers_owner_question_uidx on interview_answers(owner_id, question); create index if not exists business_profiles_owner_version_idx on business_profiles(owner_id, version desc);
