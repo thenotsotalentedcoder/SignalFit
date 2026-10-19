@@ -3,7 +3,7 @@
 ## Current state
 - Phase 1 vertical slice is wired and repaired: bcrypt signup/signin, database sessions, encrypted TOTP enrollment/challenge, AAL2 workspace gate, owner-scoped PostgreSQL queries, resumable interview, Gemini profile synthesis, review and confirmation.
 - The existing Phase 1 migration was not changed. A forward-only uniqueness/index migration was applied for resumable answer updates.
-- Research, matching, outreach and full recovery-code handling remain future work.
+- Phase 2 bounded research is now implemented: authenticated users can create one-sector/one-geography runs, inspect up to 12 public URLs, persist unavailable pages and receive a deterministic candidate or insufficient-evidence result.
 
 ## Decisions
 - PostgreSQL via `DATABASE_URL`; Gemini via server-only environment variables.

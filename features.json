@@ -4,5 +4,7 @@
   {"id":"isolation.owner-rules","priority":"must","status":"failing","verification":"Use direct requests as account B to read and mutate account A records."},
   {"id":"interview.resumable-adaptive","priority":"must","status":"failing","verification":"Save answers, resume after a fresh session, and validate bounded structured model output."},
   {"id":"profile.confirmed-versioned","priority":"must","status":"failing","verification":"Edit versions, distinguish declarations from evidence, and confirm incomplete profile."},
-  {"id":"foundation.landing-health","priority":"must","status":"passing","verification":"Open responsive landing page and GET /api/health returning JSON."}
+  {"id":"foundation.landing-health","priority":"must","status":"passing","verification":"Open responsive landing page and GET /api/health returning JSON."},
+  {"id":"research.bounded-evidence-run","priority":"must","status":"passing","verification":"Create a confirmed-profile run, inspect up to 12 public/manual URLs, and verify persisted evidence or unavailable records."},
+  {"id":"research.eligibility-insufficient-evidence","priority":"must","status":"passing","verification":"Run matching with insufficient source coverage and show an honest insufficient-evidence result."}
 ]
