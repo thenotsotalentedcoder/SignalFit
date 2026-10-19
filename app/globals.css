@@ -1,0 +1,4 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#f8fbfa;color:#102a43;font-family:Arial, sans-serif}a{color:inherit;text-decoration:none}button,input,textarea{font:inherit}.focus-ring:focus-visible,button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #ff7657;outline-offset:3px}.eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:.72rem;font-weight:700;color:#27705b}.grid-bg{background-image:linear-gradient(#d9ebe3 1px,transparent 1px),linear-gradient(90deg,#d9ebe3 1px,transparent 1px);background-size:42px 42px}
