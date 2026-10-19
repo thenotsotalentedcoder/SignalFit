@@ -1,5 +1,5 @@
 [
-  {"id":"auth.signup-signin","priority":"must","status":"failing","verification":"Create two accounts and sign in through the real API."},
+  {"id":"auth.signup-signin","priority":"must","status":"passing","verification":"Create two accounts and sign in through the real API."},
   {"id":"auth.totp-aal2","priority":"must","status":"failing","verification":"Enroll an authenticator, complete challenge, and confirm workspace rejects AAL1."},
   {"id":"isolation.owner-rules","priority":"must","status":"failing","verification":"Use direct requests as account B to read and mutate account A records."},
   {"id":"interview.resumable-adaptive","priority":"must","status":"failing","verification":"Save answers, resume after a fresh session, and validate bounded structured model output."},
