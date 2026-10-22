@@ -1,10 +1,12 @@
 [
   {"id":"auth.signup-signin","priority":"must","status":"passing","verification":"Create two accounts and sign in through the real API."},
-  {"id":"auth.totp-aal2","priority":"must","status":"failing","verification":"Enroll an authenticator, complete challenge, and confirm workspace rejects AAL1."},
-  {"id":"isolation.owner-rules","priority":"must","status":"failing","verification":"Use direct requests as account B to read and mutate account A records."},
-  {"id":"interview.resumable-adaptive","priority":"must","status":"failing","verification":"Save answers, resume after a fresh session, and validate bounded structured model output."},
-  {"id":"profile.confirmed-versioned","priority":"must","status":"failing","verification":"Edit versions, distinguish declarations from evidence, and confirm incomplete profile."},
+  {"id":"auth.totp-aal2","priority":"must","status":"passing","verification":"Enroll an authenticator, complete challenge, and confirm workspace rejects AAL1."},
+  {"id":"isolation.owner-rules","priority":"must","status":"passing","verification":"Use direct requests as account B to read and mutate account A records."},
+  {"id":"interview.resumable-adaptive","priority":"must","status":"failing","verification":"Resume and limits verified; model-generated follow-ups need a live Gemini run (provider overloaded when tried)."},
+  {"id":"profile.confirmed-versioned","priority":"must","status":"passing","verification":"Edit versions, distinguish declarations from evidence, and confirm incomplete profile."},
   {"id":"foundation.landing-health","priority":"must","status":"passing","verification":"Open responsive landing page and GET /api/health returning JSON."},
   {"id":"research.bounded-evidence-run","priority":"must","status":"passing","verification":"Create a confirmed-profile run, inspect up to 12 public/manual URLs, and verify persisted evidence or unavailable records."},
-  {"id":"research.eligibility-insufficient-evidence","priority":"must","status":"passing","verification":"Run matching with insufficient source coverage and show an honest insufficient-evidence result."}
+  {"id":"research.eligibility-insufficient-evidence","priority":"must","status":"passing","verification":"Run matching with insufficient source coverage and show an honest insufficient-evidence result."},
+  {"id":"research.grounded-matching-critique","priority":"must","status":"failing","verification":"Live model run producing cited candidates, computed score and critique; only failure/absence paths verified so far (provider 503/timeouts)."},
+  {"id":"shortlist.save-notes-export","priority":"must","status":"passing","verification":"Save, dismiss-with-reason, note and Markdown export verified through two-account API script."}
 ]

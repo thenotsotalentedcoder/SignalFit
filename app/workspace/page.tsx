@@ -1,8 +1,67 @@
 'use client';
-import {useEffect,useState} from 'react'; import {useRouter} from 'next/navigation'; import {questions,stages,nextVisibleQuestion,type Profile} from '@/lib/contracts';
-export default function Workspace(){const [answers,setAnswers]=useState<Record<string,string>>({});const [profile,setProfile]=useState<Profile|null>(null);const [confirmed,setConfirmed]=useState(false);const [field,setField]=useState('identity');const [value,setValue]=useState('');const [error,setError]=useState('');const [loading,setLoading]=useState(true);const [busy,setBusy]=useState(false);const r=useRouter();
- useEffect(()=>{fetch('/api/interview').then(async x=>{if(x.status===401){r.push('/signin');return}const d=await x.json();setAnswers(d.answers||{});setProfile(d.profile);setConfirmed(d.confirmed);const q=nextVisibleQuestion(d.answers||{});if(q){setField(q.field);setValue(d.answers?.[q.field]||'')}setLoading(false)}).catch(()=>{setError('Could not load your saved interview.');setLoading(false)})},[r]);
- const q=questions.find(x=>x.field===field); const visible=questions.filter(x=>!(x.field==='proof'&&/no proof|none/i.test(answers.services||''))); const index=visible.findIndex(x=>x.field===field); const stage=q?.stage||'Review';
- async function save(skip=false){if(!q)return;setBusy(true);setError('');const answer=skip?'':value.trim();const x=await fetch('/api/interview',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({field,answer,skip})});if(!x.ok){setError((await x.json()).error||'Could not save');setBusy(false);return}const updated={...answers,[field]:answer};setAnswers(updated);const next=nextVisibleQuestion(updated);if(next){setField(next.field);setValue(updated[next.field]||'')}else{const p=await fetch('/api/profile',{method:'POST'});const d=await p.json();if(p.ok)setProfile(d.profile);else setError(d.error||'Profile generation failed. Your answers are saved.')}setBusy(false)}
- if(loading)return <main className="p-10">Loading your workspace…</main>; return <main className="min-h-screen bg-[#f8fbfa]"><header className="border-b bg-white"><div className="mx-auto flex max-w-6xl justify-between px-6 py-5"><b>signal<span className="text-coral">fit</span></b><button onClick={()=>fetch('/api/auth/signout',{method:'POST'}).then(()=>r.push('/'))} className="text-sm font-bold">Sign out</button></div></header><section className="mx-auto max-w-4xl px-6 py-10"><div className="flex items-center justify-between"><p className="eyebrow">Day 1 · Business profile</p><a href="/research" className="rounded-full border px-4 py-2 text-sm font-bold">Research a signal →</a></div><div className="mt-5 grid grid-cols-6 gap-2">{stages.map((s,i)=><div key={s}><div className={`h-2 rounded ${i<=stages.indexOf(stage)?'bg-coral':'bg-slate-200'}`}/><span className="mt-2 hidden text-xs text-slate-500 sm:block">{s}</span></div>)}</div>{profile?<Review profile={profile} confirmed={confirmed} onConfirm={async()=>{const x=await fetch('/api/profile/confirm',{method:'POST'});if(x.ok)setConfirmed(true);else setError('Could not confirm this profile.')}} onRevise={()=>{setProfile(null);setConfirmed(false);const first=nextVisibleQuestion(answers);if(first){setField(first.field);setValue(answers[first.field]||'')}}}/>:<div className="mt-10 rounded-3xl bg-white p-7 shadow-sm"><p className="text-sm font-bold text-slate-500">Question {Math.max(index+1,1)} of {visible.length}</p><h1 className="mt-4 text-3xl font-black">{q?.title}</h1><p className="mt-3 text-slate-600">{q?.hint}</p><textarea value={value} onChange={e=>setValue(e.target.value)} className="mt-7 min-h-32 w-full rounded-2xl border p-4" placeholder="Your answer…"/><div className="mt-6 flex flex-wrap gap-3"><button onClick={()=>save(false)} disabled={!value.trim()||busy} className="rounded-full bg-ink px-5 py-3 font-bold text-white disabled:opacity-40">{busy?'Saving…':'Save & continue'}</button><button onClick={()=>save(true)} disabled={busy} className="rounded-full border px-5 py-3 font-bold">Skip / I don’t know</button>{index>0&&<button onClick={()=>{const prev=visible[index-1];setField(prev.field);setValue(answers[prev.field]||'')}} className="rounded-full border px-5 py-3 font-bold">Back</button>}</div>{error&&<p className="mt-4 text-sm text-red-600">{error}</p>}</div>}</section></main>}
-function Review({profile,confirmed,onConfirm,onRevise}:{profile:Profile;confirmed:boolean;onConfirm:()=>void;onRevise:()=>void}){const groups:[string,string[]][]=[['Services',profile.services],['Capabilities',profile.capabilities],['Evidence from your statements',profile.evidence],['Ideal customers', [profile.customers]],['Buyer roles',profile.buyerRoles],['Differentiators',profile.differentiators],['Commercial preferences',[profile.preferences]],['Constraints',profile.constraints],['Unknown / needs confirmation',profile.unknowns],['Search criteria',profile.searchCriteria]];return <div className="mt-10 rounded-3xl bg-white p-7 shadow-sm"><p className="eyebrow">{confirmed?'Confirmed profile':'Review before research'}</p>{profile.source==='deterministic'&&<p className="mt-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">Incomplete deterministic draft: Gemini is not configured or did not return valid data. Review carefully.</p>}<h1 className="mt-3 text-3xl font-black">{profile.summary}</h1>{groups.map(([title,items])=><section key={title} className="mt-6"><h2 className="font-bold">{title}</h2><ul className="mt-2 list-disc pl-5 text-slate-600">{items.length?items.map((x,i)=><li key={i}>{x}</li>):<li>Not provided yet.</li>}</ul></section>)}<div className="mt-8 flex gap-3"><button onClick={onRevise} className="rounded-full border px-5 py-3 font-bold">Revise profile</button>{!confirmed&&<button onClick={onConfirm} className="rounded-full bg-coral px-5 py-3 font-bold text-white">Confirm profile</button>}</div><p className="mt-3 text-xs text-slate-500">Research and opportunity discovery are not available in Phase 1.</p></div>}
+import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import AppShell from '@/components/AppShell';
+import InterviewStep from '@/components/InterviewStep';
+import ProfileReview from '@/components/ProfileReview';
+import { api } from '@/lib/client';
+import type { Profile } from '@/lib/contracts';
+import type { Question, Step } from '@/lib/interview';
+
+type State = { answers: Record<string, string>; questions: Question[]; step: Step; profile: Profile | null; profileVersion: number | null; confirmed: boolean };
+
+export default function Workspace() {
+  const router = useRouter();
+  const [s, setS] = useState<State | null>(null); const [editing, setEditing] = useState<string | null>(null); const [revising, setRevising] = useState(false);
+  const [busy, setBusy] = useState(false); const [error, setError] = useState(''); const [aiError, setAiError] = useState('');
+
+  const load = useCallback(async () => {
+    const r = await api('/api/interview'); if (r.status === 401) { router.push('/signin'); return null; }
+    if (!r.ok) { setError(r.data.error || 'Could not load your saved interview.'); return null; }
+    setS(r.data); return r.data as State;
+  }, [router]);
+  useEffect(() => { void load(); }, [load]);
+
+  // Core questions are done: ask the model for one follow-up (or to close). Failure is recoverable.
+  const needsFollowup = s?.step.kind === 'generate' && !editing && !revising;
+  const askFollowup = useCallback(async (skip = false) => {
+    setBusy(true); setAiError('');
+    const r = await api('/api/interview/followup', 'POST', skip ? { skip: true } : {});
+    if (!r.ok) setAiError(r.data.error || 'Could not generate a follow-up question.');
+    await load(); setBusy(false);
+  }, [load]);
+  useEffect(() => { if (needsFollowup && !busy && !aiError) void askFollowup(); }, [needsFollowup, busy, aiError, askFollowup]);
+
+  async function save(question: Question, value: string, skip: boolean) {
+    setBusy(true); setError('');
+    const r = await api('/api/interview', 'POST', { field: question.field, answer: value.trim(), skip });
+    if (!r.ok) { setError(r.data.error || 'Could not save.'); setBusy(false); return; }
+    const fresh = await load(); setBusy(false);
+    if (editing && fresh) { const list = fresh.questions; const i = list.findIndex((q) => q.field === question.field); setEditing(list[i + 1] && revising ? list[i + 1].field : null); }
+  }
+  async function build() {
+    setBusy(true); setError(''); const r = await api('/api/profile', 'POST');
+    if (!r.ok) setError(r.data.error || 'Profile generation failed. Your answers are saved.'); else { setRevising(false); await load(); }
+    setBusy(false);
+  }
+
+  if (!s) return <AppShell>{error ? <p role="alert" className="alert-error">{error}</p> : <div aria-busy="true" aria-label="Loading your workspace" className="space-y-3"><div className="skeleton h-6 w-1/3" /><div className="skeleton h-48" /></div>}</AppShell>;
+
+  const showProfile = s.profile && !revising && !editing;
+  const current = editing ? s.questions.find((q) => q.field === editing) : s.step.kind === 'question' ? s.step.question : undefined;
+  const index = current ? s.questions.findIndex((q) => q.field === current.field) + 1 : 0;
+  const total = s.step.kind === 'question' ? s.step.total : Math.max(s.questions.length, 8);
+
+  return <AppShell>
+    {showProfile ? <ProfileReview profile={s.profile!} version={s.profileVersion} confirmed={s.confirmed} onChanged={() => void load()} onRevise={() => { setRevising(true); setEditing(s.questions[0].field); }} />
+      : current ? <InterviewStep question={current} index={index} total={total} initial={s.answers[current.field] ?? ''} busy={busy} error={error} canGoBack={index > 1}
+          onSave={(v, skip) => void save(current, v, skip)} onBack={() => setEditing(s.questions[index - 2].field)} />
+      : needsFollowup || (s.step.kind === 'generate') ? <section className="card" aria-live="polite">
+          <p className="eyebrow">Almost there</p><h1 className="mt-2 text-xl font-bold">{aiError ? 'Follow-up question unavailable' : 'Choosing your next question…'}</h1>
+          {aiError ? <><p role="alert" className="alert-error mt-3">{aiError}</p><div className="mt-4 flex flex-wrap gap-2"><button className="btn-primary" onClick={() => void askFollowup()}>Try again</button><button className="btn-secondary" onClick={() => void askFollowup(true)}>Continue without follow-ups</button></div></> : <div className="skeleton mt-4 h-10" aria-busy="true" />}
+        </section>
+      : <section className="card"><p className="eyebrow">Interview complete</p><h1 className="mt-2 text-xl font-bold">Ready to build your profile</h1><p className="mt-2 text-sm text-muted">We turn your answers into an editable draft. You review and confirm it before any research starts. Anything you left unknown stays marked unknown.</p>
+          {error && <p role="alert" className="alert-error mt-3">{error}</p>}
+          <div className="mt-4 flex flex-wrap gap-2"><button className="btn-brand" onClick={() => void build()} disabled={busy}>{busy ? 'Building…' : 'Build my profile'}</button><button className="btn-secondary" onClick={() => setEditing(s.questions[s.questions.length - 1].field)}>Edit my answers</button></div></section>}
+  </AppShell>;
+}

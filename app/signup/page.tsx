@@ -1,1 +1,24 @@
-'use client'; import Link from 'next/link'; import {useState} from 'react'; import {useRouter} from 'next/navigation'; export default function Signup(){const [email,setEmail]=useState('');const [password,setPassword]=useState('');const [error,setError]=useState('');const r=useRouter();async function submit(e:React.FormEvent){e.preventDefault();const x=await fetch('/api/auth/signup',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,password})});const d=await x.json();if(x.ok)r.push(d.next);else setError(d.error)}return <main className="grid min-h-screen place-items-center bg-ink px-6"><section className="w-full max-w-md rounded-3xl bg-white p-8"><Link href="/" className="font-black">signal<span className="text-coral">fit</span></Link><h1 className="mt-10 text-3xl font-black">Create your account</h1><p className="mt-2 text-slate-500">Already have one? <Link className="font-bold text-emerald-700" href="/signin">Sign in</Link></p><form onSubmit={submit} className="mt-8 space-y-5"><label className="block text-sm font-bold">Email<input value={email} onChange={e=>setEmail(e.target.value)} className="mt-2 w-full rounded-xl border p-3" type="email" required /></label><label className="block text-sm font-bold">Password<input value={password} onChange={e=>setPassword(e.target.value)} className="mt-2 w-full rounded-xl border p-3" type="password" minLength={8} required /></label><button className="w-full rounded-xl bg-coral p-3 font-bold text-white">Create account</button></form>{error&&<p className="mt-4 text-sm text-red-600">{error}</p>}</section></main>}
+'use client';
+import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import AuthCard from '@/components/AuthCard';
+import { api } from '@/lib/client';
+
+export default function Signup() {
+  const [email, setEmail] = useState(''); const [password, setPassword] = useState(''); const [error, setError] = useState(''); const [busy, setBusy] = useState(false);
+  const router = useRouter();
+  async function submit(e: React.FormEvent) {
+    e.preventDefault(); setBusy(true); setError('');
+    const r = await api('/api/auth/signup', 'POST', { email, password });
+    if (r.ok) router.push(r.data.next); else { setError(r.data.error); setBusy(false); }
+  }
+  return <AuthCard title="Create your account" lead={<>Already registered? <Link className="font-semibold text-brand underline" href="/signin">Sign in</Link>. Next you add an authenticator app; the workspace stays locked until you do.</>}>
+    <form onSubmit={submit} className="space-y-4">
+      <label className="label">Email<input className="field" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
+      <label className="label">Password<input className="field" type="password" autoComplete="new-password" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} required aria-describedby="pw-hint" /><span id="pw-hint" className="mt-1 block text-xs font-normal text-muted">At least 8 characters. Your email is not verified yet.</span></label>
+      {error && <p role="alert" className="alert-error">{error}</p>}
+      <button className="btn-primary w-full" disabled={busy}>{busy ? 'Creating…' : 'Create account'}</button>
+    </form>
+  </AuthCard>;
+}

@@ -1,1 +1,24 @@
-'use client'; import Link from 'next/link'; import {useState} from 'react'; import {useRouter} from 'next/navigation'; export default function Signin(){const [email,setEmail]=useState('');const [password,setPassword]=useState('');const [error,setError]=useState('');const r=useRouter();async function submit(e:React.FormEvent){e.preventDefault();const x=await fetch('/api/auth/signin',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,password})});const d=await x.json();if(x.ok)r.push(d.next);else setError(d.error)}return <main className="grid min-h-screen place-items-center bg-ink px-6"><section className="w-full max-w-md rounded-3xl bg-white p-8"><Link href="/" className="font-black">signal<span className="text-coral">fit</span></Link><h1 className="mt-10 text-3xl font-black">Welcome back</h1><p className="mt-2 text-slate-500">New here? <Link className="font-bold text-emerald-700" href="/signup">Create an account</Link></p><form onSubmit={submit} className="mt-8 space-y-5"><label className="block text-sm font-bold">Email<input value={email} onChange={e=>setEmail(e.target.value)} className="mt-2 w-full rounded-xl border p-3" type="email" required /></label><label className="block text-sm font-bold">Password<input value={password} onChange={e=>setPassword(e.target.value)} className="mt-2 w-full rounded-xl border p-3" type="password" required /></label><button className="w-full rounded-xl bg-coral p-3 font-bold text-white">Sign in</button></form>{error&&<p className="mt-4 text-sm text-red-600">{error}</p>}</section></main>}
+'use client';
+import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import AuthCard from '@/components/AuthCard';
+import { api } from '@/lib/client';
+
+export default function Signin() {
+  const [email, setEmail] = useState(''); const [password, setPassword] = useState(''); const [error, setError] = useState(''); const [busy, setBusy] = useState(false);
+  const router = useRouter();
+  async function submit(e: React.FormEvent) {
+    e.preventDefault(); setBusy(true); setError('');
+    const r = await api('/api/auth/signin', 'POST', { email, password });
+    if (r.ok) router.push(r.data.next); else { setError(r.data.error); setBusy(false); }
+  }
+  return <AuthCard title="Sign in" lead={<>New here? <Link className="font-semibold text-brand underline" href="/signup">Create an account</Link></>}>
+    <form onSubmit={submit} className="space-y-4">
+      <label className="label">Email<input className="field" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
+      <label className="label">Password<input className="field" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required /></label>
+      {error && <p role="alert" className="alert-error">{error}</p>}
+      <button className="btn-primary w-full" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
+    </form>
+  </AuthCard>;
+}
