@@ -1,1 +1,1 @@
-import { NextResponse } from 'next/server'; import { revokeSession } from '@/lib/auth'; export async function POST(){await revokeSession(); return NextResponse.json({ok:true});}
+import { NextResponse } from 'next/server'; import { revokeSession } from '@/lib/auth'; import { checkOrigin } from '@/lib/guard'; export async function POST(req:Request){const bad=checkOrigin(req);if(bad)return bad;await revokeSession(); return NextResponse.json({ok:true});}

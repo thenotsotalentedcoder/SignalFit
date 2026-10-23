@@ -1,3 +1,34 @@
 import Link from 'next/link';
-export default function Home() { return <main className="min-h-screen grid-bg"><nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-7"><Link href="/" className="text-xl font-black tracking-tight">signal<span className="text-coral">fit</span></Link><div className="flex items-center gap-5 text-sm font-semibold"><Link href="/signin" className="focus-ring">Sign in</Link><Link href="/signup" className="focus-ring rounded-full bg-ink px-5 py-3 text-white">Create account</Link></div></nav><section className="mx-auto grid max-w-6xl items-center gap-14 px-6 pb-24 pt-20 lg:grid-cols-[1.1fr_.9fr]"><div><p className="eyebrow">For independent builders & small studios</p><h1 className="mt-5 max-w-3xl text-5xl font-black leading-[1.04] tracking-tight sm:text-7xl">Find the work your business is <span className="text-coral">built to win.</span></h1><p className="mt-7 max-w-xl text-lg leading-8 text-slate-600">SignalFit learns what you can genuinely deliver, then helps you investigate current needs that fit your skills, capacity and goals — without pretending a lead is a sale.</p><div className="mt-9 flex flex-wrap gap-4"><Link href="/signup" className="focus-ring rounded-full bg-coral px-6 py-4 font-bold text-white shadow-lg shadow-orange-200">Build your profile</Link><a href="#how" className="focus-ring rounded-full border border-ink/20 px-6 py-4 font-bold">See how it works</a></div><p className="mt-5 text-sm text-slate-500">A focused interview first. Evidence-backed research later.</p></div><div className="rounded-[2rem] border border-white bg-white/80 p-7 shadow-xl shadow-emerald-900/10 backdrop-blur"><div className="flex items-center justify-between border-b border-slate-100 pb-5"><span className="font-bold">Your business signal</span><span className="rounded-full bg-mint px-3 py-1 text-xs font-bold text-emerald-800">In progress</span></div><div className="space-y-5 py-7"><div><p className="text-sm text-slate-500">What you deliver</p><p className="mt-1 font-bold">Workflow automation & integrations</p></div><div><p className="text-sm text-slate-500">What still needs clarity</p><p className="mt-1 font-bold">Preferred project size · proof to share</p></div><div className="rounded-2xl bg-ink p-5 text-white"><p className="text-sm text-slate-300">The next useful question</p><p className="mt-2 text-lg font-bold">Which systems have you connected in real client work?</p></div></div><p className="text-xs leading-5 text-slate-500">Your statements stay distinct from evidence inspected later. You confirm before research begins.</p></div></section><section id="how" className="mx-auto max-w-6xl px-6 pb-20"><div className="grid gap-5 md:grid-cols-3"><Step n="01" title="Tell us what is true">A short adaptive interview surfaces capabilities, proof, capacity and constraints.</Step><Step n="02" title="Review your profile">Edit the draft, see unknowns clearly, and confirm what SignalFit may use.</Step><Step n="03" title="Investigate fit">Research is bounded and source-backed. No fabricated certainty, no outreach sent.</Step></div></section></main> }
-function Step({n,title,children}:{n:string,title:string,children:string}){return <article className="rounded-3xl bg-white p-6 shadow-sm"><p className="eyebrow">{n}</p><h2 className="mt-4 text-xl font-bold">{title}</h2><p className="mt-3 leading-7 text-slate-600">{children}</p></article>}
+
+const steps = [
+  ['Tell us what is true', 'A short interview adapts to your answers: capabilities, proof, capacity and exclusions.'],
+  ['Review and confirm', 'Edit the draft profile. Your statements stay separate from anything we inspect later.'],
+  ['Investigate fit', 'Bounded research reads real pages. Every claim cites stored evidence; nothing is sent to anyone.']
+];
+export default function Home() {
+  return <>
+    <header className="border-b border-line bg-white"><div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
+      <Link href="/" className="text-lg font-black tracking-tight">signal<span className="text-coral">fit</span></Link>
+      <nav aria-label="Account" className="flex items-center gap-2"><Link href="/signin" className="btn-secondary">Sign in</Link><Link href="/signup" className="btn-primary">Create account</Link></nav>
+    </div></header>
+    <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-16">
+      <section className="grid gap-10 lg:grid-cols-[1.2fr_1fr] lg:items-start">
+        <div>
+          <p className="eyebrow">For freelancers and small studios</p>
+          <h1 className="mt-3 text-3xl font-black leading-tight sm:text-5xl">Find the work your business is built to win.</h1>
+          <p className="mt-5 max-w-xl text-lg text-muted">SignalFit learns what you can genuinely deliver, then checks current public demand against it. A job posting is treated as advertised work, never as proof someone will buy.</p>
+          <div className="mt-8 flex flex-wrap gap-3"><Link href="/signup" className="btn-brand">Build your profile</Link><a href="#how" className="btn-secondary">How it works</a></div>
+        </div>
+        <aside aria-label="Example result" className="card">
+          <p className="eyebrow">Illustration, not a customer result</p>
+          <h2 className="mt-2 text-lg font-bold">Invoice-to-ERP sync for freight forwarders</h2>
+          <p className="mt-2 flex flex-wrap gap-2"><span className="badge-warn">Single-company lead</span><span className="badge-neutral">Fit not yet scored</span></p>
+          <ul className="mt-4 space-y-2 text-sm"><li><b>Observed:</b> one dated posting asks for API integration work.</li><li><b>Still unknown:</b> budget, urgency, willingness to outsource.</li><li><b>Next step:</b> questions to ask the buyer, not a pitch.</li></ul>
+        </aside>
+      </section>
+      <section id="how" className="mt-14 sm:mt-20"><h2 className="text-xl font-bold">How it works</h2>
+        <ol className="mt-4 grid gap-4 md:grid-cols-3">{steps.map(([t, d], i) => <li key={t} className="card"><span className="eyebrow">Step {i + 1}</span><h3 className="mt-2 font-bold">{t}</h3><p className="mt-1 text-sm text-muted">{d}</p></li>)}</ol>
+      </section>
+    </main>
+  </>;
+}
